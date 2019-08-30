@@ -7,7 +7,6 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
-import com.couchbase.lite.EncryptionKey;
 import com.couchbase.lite.Endpoint;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.LogFileConfiguration;
@@ -89,12 +88,6 @@ class CBManager {
             }
         }
         return resultMap;
-    }
-
-    // ENCRYPTION IS ONLY COMPATIBLE WITH ENTERPRISE EDITION - NOT SUPPORTING //
-    private void setEncryptionKey(String password) {
-        EncryptionKey key = new EncryptionKey(password);
-        mDBConfig.setEncryptionKey(key);
     }
 
     public void initDatabaseWithName(String _name) throws CouchbaseLiteException {
