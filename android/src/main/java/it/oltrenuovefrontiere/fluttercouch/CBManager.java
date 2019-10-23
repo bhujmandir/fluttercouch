@@ -17,6 +17,8 @@ import com.couchbase.lite.ReplicatorConfiguration;
 import com.couchbase.lite.SessionAuthenticator;
 import com.couchbase.lite.URLEndpoint;
 import com.couchbase.lite.Query;
+import com.couchbase.lite.IndexBuilder;
+import com.couchbase.lite.FullTextIndexItem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -25,6 +27,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 class CBManager {
     private HashMap<String, Database> mDatabase = new HashMap<>();
@@ -93,8 +97,25 @@ class CBManager {
     public void initDatabaseWithName(String _name) throws CouchbaseLiteException {
         if (!mDatabase.containsKey(_name)) {
             defaultDatabase = _name;
-            mDatabase.put(_name, new Database(_name, mDBConfig));
+            Database db = new Database(_name, mDBConfig);
+
+            mDatabase.put(_name, db);
         }
+    }
+
+    public void createIndex(String _indexName, String[] properties) throws CouchbaseLiteException {
+        Database db = getDatabase();
+
+        List<FullTextIndexItem> propertyList = new ArrayList<FullTextIndexItem>();
+
+        for (String property : properties) {
+            propertyList.add(FullTextIndexItem.property(property));
+        }
+
+        FullTextIndexItem[] propertyArray = new FullTextIndexItem[propertyList.size()];
+        propertyArray = propertyList.toArray(propertyArray);
+
+        db.createIndex(_indexName, IndexBuilder.fullTextIndex(propertyArray).ignoreAccents(true));
     }
 
     public void deleteDatabaseWithName(String _name) throws CouchbaseLiteException {

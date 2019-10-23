@@ -94,7 +94,21 @@ class CBManager {
             defaultDatabase = name
         }
     }
-    
+
+    func createIndex(name: String, properties: [String]) throws {
+        guard let db: Database = getDatabase() else {fatalError("db is not initialized at this point!")}
+
+        var propertyList = [FullTextIndexItem]()
+
+        for property in properties {
+            propertyList.append(FullTextIndexItem.property(property))
+        }
+
+        try db.createIndex(
+            IndexBuilder.fullTextIndex(items: propertyList).ignoreAccents(true), withName: name)
+
+    }
+
     func deleteDatabaseWithName(name: String) throws {
         try Database.delete(withName: name)
     }

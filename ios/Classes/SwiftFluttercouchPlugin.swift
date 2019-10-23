@@ -48,6 +48,22 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin, CBManagerDelegate
             } catch {
                 result(FlutterError.init(code: "errInit", message: "Error initializing database with name \(_name)", details: error.localizedDescription))
             }
+        case "createIndex":
+            let arguments = call.arguments! as! [String:Any]
+            let name = arguments["name"] as! String?
+            let properties = arguments["properties"] as! String?
+            let propertiesArray = properties!.components(separatedBy: ",")
+            
+            if (name != nil && properties != nil){
+                do {
+                    try mCBManager.createIndex(name: name!, properties: propertiesArray)
+                    result(nil)
+                } catch {
+                    result(FlutterError.init(code: "errSave", message: "Error creating index \(name!)", details: error.localizedDescription))
+                }
+            } else {
+                result(FlutterError.init(code: "errArgs", message: "Error creating index: Invalid Arguments", details: ""))
+            }
         case "closeDatabaseWithName":
             let _name : String = call.arguments! as! String
             do {

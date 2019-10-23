@@ -413,6 +413,13 @@ public class QueryJson {
                     returnExpression = Expression.string(value)
                 case ("value", let value):
                     returnExpression = Expression.value(value)
+                case ("fullText", let value as String):
+                    let index = value.index(of: "|")
+                    let indexName = value.prefix(upTo: index!)
+                    var query = value.suffix(from: index!)
+                    query.remove(at: query.startIndex)
+
+                    returnExpression = FullTextExpression.index(String(indexName)).match(String(query))
                 default:
                     break
                 }

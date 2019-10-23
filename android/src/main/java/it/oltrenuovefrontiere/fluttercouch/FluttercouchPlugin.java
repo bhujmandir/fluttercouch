@@ -100,6 +100,20 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                         result.error("errInit", "error initializing database with name " + _name, e.toString());
                     }
                     break;
+                case ("createIndex"):
+                    if (call.hasArgument("name") && call.hasArgument("properties")) {
+                        _name = call.argument("name");
+                        String _properties = call.argument("properties");
+                        try {
+                            mCBManager.createIndex(_name, _properties.split(","));
+                            result.success(_name);
+                        } catch (Exception e) {
+                            result.error("errInit", "error creating index " + _name, e.toString());
+                        }
+                    } else {
+                        result.error("errArg", "invalid arguments", null);
+                    }
+                    break;
                 case ("closeDatabaseWithName"):
                     _name = call.arguments();
                     try {

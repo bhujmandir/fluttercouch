@@ -24,6 +24,7 @@ export 'query/expression/meta_expression.dart';
 export 'query/expression/meta.dart';
 export 'query/expression/property_expression.dart';
 export 'query/expression/variable_expression.dart';
+export 'query/expression/full_text_expression.dart';
 
 import 'dart:async';
 
@@ -41,6 +42,10 @@ abstract class Fluttercouch {
 
   Future<String> initDatabaseWithName(String _name) =>
       _methodChannel.invokeMethod('initDatabaseWithName', _name);
+
+  Future<String> createIndex(String _name, String _properties) =>
+      _methodChannel.invokeMethod('createIndex',
+          <String, dynamic>{'name': _name, 'properties': _properties});
 
   Future<String> saveDocument(Document _doc) =>
       _methodChannel.invokeMethod('saveDocument', _doc.toMap());

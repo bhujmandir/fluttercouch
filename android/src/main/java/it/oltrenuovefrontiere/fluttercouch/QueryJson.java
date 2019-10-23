@@ -2,6 +2,7 @@ package it.oltrenuovefrontiere.fluttercouch;
 
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Expression;
+import com.couchbase.lite.FullTextExpression;
 import com.couchbase.lite.From;
 import com.couchbase.lite.GroupBy;
 import com.couchbase.lite.Join;
@@ -275,6 +276,7 @@ class QueryJson {
 
     private Expression inflateExpressionFromArray(List<Map<String, Object>> expressionParametersArray) {
         Expression returnExpression = null;
+        
         for (int i = 0; i <= expressionParametersArray.size() - 1; i++) {
             Map<String, Object> currentExpression = expressionParametersArray.get(i);
             if (returnExpression == null) {
@@ -318,6 +320,13 @@ class QueryJson {
                     case ("value"):
                         returnExpression = Expression.value(currentExpression.get("value"));
                         break;
+                    case ("fullText"):
+                        String fullTextValue = (String)currentExpression.get("fullText");
+                        int splitIndex = fullTextValue.indexOf("|");        
+                        String indexName = fullTextValue.substring(0, splitIndex);
+                        String query = fullTextValue.substring(splitIndex + 1);
+
+                        returnExpression = FullTextExpression.index(indexName).match(query);
                 }
             } else {
                 switch (currentExpression.keySet().iterator().next()) {
