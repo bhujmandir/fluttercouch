@@ -28,6 +28,7 @@ class CBManager {
     private var defaultDatabase = "defaultDatabase";
     private var mDBConfig = DatabaseConfiguration();
     private weak var mDelegate: CBManagerDelegate?
+    fileprivate var _applicationSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last
     
     init(delegate: CBManagerDelegate, enableLogging: Bool) {
         mDelegate = delegate
@@ -84,13 +85,45 @@ class CBManager {
         }
         return NSDictionary.init(dictionary: resultMap)
     }
-    
+
     func initDatabaseWithName(name: String) throws {
         if mDatabase.keys.contains(name) {
             defaultDatabase = name
         } else {
-            let newDatabase = try Database(name: name,config: mDBConfig)
-            mDatabase[name] = newDatabase
+            guard let assetFolderUrl = _applicationSupportDirectory else {
+                fatalError("Could not open Application Support Directory for app!")
+                return
+            }
+            let assetFolderPath = assetFolderUrl.path
+            let fileManager = FileManager.default
+            if !fileManager.fileExists(atPath: assetFolderPath) {
+                try fileManager.createDirectory(atPath: assetFolderPath,
+                                                withIntermediateDirectories: true,
+                                                attributes: nil)
+                
+            }
+
+            // Set the folder path for the CBLite DB
+            mDBConfig.directory = assetFolderPath
+
+            // Load the prebuilt database if it exists at the specified folder
+            if Database.exists(withName: name, inDirectory: assetFolderPath) == false {
+                // Load prebuilt database from App Bundle and copy over to Applications support path
+                if let prebuiltPath = Bundle.main.path(forResource: name, ofType: "cblite2") {
+                    try Database.copy(fromPath: prebuiltPath, toDatabase: "\(name)", withConfig: mDBConfig)
+                    
+                }
+                // Get handle to DB  specified path
+                let newDatabase = try Database(name: name, config: mDBConfig)
+                mDatabase[name] = newDatabase
+            }
+            else
+            {
+                // Gets handle to existing DB at specified path
+                let newDatabase = try Database(name: name, config: mDBConfig)
+                mDatabase[name] = newDatabase
+            }
+
             defaultDatabase = name
         }
     }
