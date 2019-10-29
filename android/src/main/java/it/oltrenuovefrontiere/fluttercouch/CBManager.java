@@ -22,13 +22,22 @@ import com.couchbase.lite.FullTextIndexItem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+
+import android.content.Context;
+import java.io.OutputStreamWriter;
 
 class CBManager {
     private HashMap<String, Database> mDatabase = new HashMap<>();
@@ -97,8 +106,16 @@ class CBManager {
     public void initDatabaseWithName(String _name) throws CouchbaseLiteException {
         if (!mDatabase.containsKey(_name)) {
             defaultDatabase = _name;
-            Database db = new Database(_name, mDBConfig);
 
+            try {
+                AssetManager assetManager = mDelegate.getAssets();
+                File path = new File(mDelegate.getContext().getFilesDir().toString());
+                unzip(assetManager.open(_name + ".cblite2.zip"), path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Database db = new Database(_name, mDBConfig);
             mDatabase.put(_name, db);
         }
     }
@@ -231,5 +248,40 @@ class CBManager {
         }
 
         return query;
+    }
+
+    private static void unzip(InputStream in, File destination) throws IOException {
+        byte[] buffer = new byte[1024];
+
+        ZipInputStream zis = new ZipInputStream(in);
+        ZipEntry ze = zis.getNextEntry();
+
+        while (ze != null) {
+            String fileName = ze.getName();
+            File newFile = new File(destination, fileName);
+
+            if (ze.isDirectory()) {
+                newFile.mkdirs();
+            } else {
+                new File(newFile.getParent()).mkdirs();
+
+                FileOutputStream fos = new FileOutputStream(newFile);
+
+                int len;
+
+                while ((len = zis.read(buffer)) > 0) {
+                    fos.write(buffer, 0, len);
+                }
+
+                fos.close();
+            }
+
+            ze = zis.getNextEntry();
+        }
+
+        zis.closeEntry();
+        zis.close();
+
+        in.close();
     }
 }
