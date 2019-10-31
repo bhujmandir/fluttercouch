@@ -107,12 +107,16 @@ class CBManager {
         if (!mDatabase.containsKey(_name)) {
             defaultDatabase = _name;
 
-            try {
-                AssetManager assetManager = mDelegate.getAssets();
-                File path = new File(mDelegate.getContext().getFilesDir().toString());
-                unzip(assetManager.open(_name + ".cblite2.zip"), path);
-            } catch (IOException e) {
-                e.printStackTrace();
+            File dbFile = new File(mDelegate.getContext().getFilesDir().toString(), _name + ".cblite2");
+
+            if (!dbFile.exists()) {
+                try {
+                    AssetManager assetManager = mDelegate.getAssets();
+                    File path = new File(mDelegate.getContext().getFilesDir().toString());
+                    unzip(assetManager.open(_name + ".cblite2.zip"), path);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
             Database db = new Database(_name, mDBConfig);
