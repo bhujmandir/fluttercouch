@@ -42,7 +42,7 @@ abstract class Expression {
     return MetaExpression({"not": expression.internalExpressionStack});
   }
 
-  final List<Map<String, dynamic>> internalExpressionStack = new List();
+  final List<Map<String, dynamic>> internalExpressionStack = [];
 
   List<Map<String, dynamic>> get expressionStack =>
       List.from(internalExpressionStack);

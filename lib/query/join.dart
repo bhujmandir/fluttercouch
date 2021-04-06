@@ -29,7 +29,7 @@ class Join {
     return Join._internal("leftOuterJoin", _dataSource, as: as);
   }
 
-  List<Map<String, dynamic>> _internalStack = List();
+  List<Map<String, dynamic>> _internalStack = [];
 
   Join on(Expression _expression) {
     this._internalStack.add({"on": _expression});

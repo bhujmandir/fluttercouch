@@ -97,7 +97,7 @@ class Document {
     if (internalState != null) {
       return internalState.keys.toList();
     } else {
-      return List<String>();
+      return [];
     }
   }
 
