@@ -38,7 +38,7 @@ class Query {
       final List<dynamic> resultSet =
           await _channel.invokeMethod('executeQuery', this);
 
-      List<Result> results = List<Result>();
+      List<Result> results = [];
       for (dynamic result in resultSet) {
         Result newResult = Result();
         newResult.setMap(result["map"]);
@@ -55,8 +55,6 @@ class Query {
 
       rethrow;
     }
-
-    return null;
   }
 
   /// Adds a query change listener and posts changes to [callback].
@@ -73,7 +71,7 @@ class Query {
       ResultSet result;
 
       if (resultList != null) {
-        List<Result> results = List<Result>();
+        List<Result> results = [];
         for (dynamic result in resultList) {
           Result newResult = Result();
           newResult.setMap(result["map"]);

@@ -88,7 +88,7 @@ void main() {
     expect(mutableDocument.getMap('map'), {"test": true});
   });
   test("mutableDocument: setting list", () {
-    mutableDocument.setArray('list', List<int>());
+    mutableDocument.setArray('list', List<int>.empty(growable: true));
     expect(mutableDocument.getList('list'), []);
   });
   test("mutableDocument: null list", () {

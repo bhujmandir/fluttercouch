@@ -17,7 +17,7 @@ class SelectResultProtocol {
   }
 
   Expression expression;
-  String alias;
+  var alias;
 
   List<Map<String, dynamic>> toJson() {
     if (alias != null) {
